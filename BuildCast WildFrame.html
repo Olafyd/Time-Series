@@ -1,12 +1,1167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuildCast WildFrame</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BuildCast — Construction Cost Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#F7F6F2;color:#1A1814;min-height:100vh}
+button{font-family:'DM Sans',sans-serif;transition:all 0.15s;cursor:pointer}
+button:hover{opacity:0.87}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#CEC9BC;border-radius:3px}
+input[type=range]{cursor:pointer}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* Header */
+header{background:#fff;border-bottom:1px solid #E5E1D8;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,0.05)}
+.header-inner{max-width:1180px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo-area{display:flex;align-items:center;gap:12px}
+.logo-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-title{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:#1A1814;letter-spacing:-0.5px}
+.logo-divider{width:1px;height:20px;background:#E5E1D8}
+.logo-sub{font-size:11px;color:#96908A;font-weight:500}
+.header-right{display:flex;align-items:center;gap:14px}
+.date-badge{font-size:11px;color:#96908A;background:#F2F1EC;border:1px solid #E5E1D8;border-radius:6px;padding:4px 10px}
+.tab-nav{display:flex;gap:2px;background:#F2F1EC;border-radius:10px;padding:3px;border:1px solid #E5E1D8}
+.tab-btn{padding:6px 18px;border-radius:8px;border:none;font-size:12px;font-weight:600;transition:all 0.18s;font-family:'DM Sans',sans-serif}
+.tab-btn.active{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab-btn:not(.active){background:transparent;color:#524E48}
+
+/* Main */
+.main{max-width:1180px;margin:0 auto;padding:22px 28px}
+
+/* Alert */
+.alert{background:#FDF6EF;border:1px solid #D9A87A;border-radius:10px;padding:13px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;animation:fadeIn 0.35s ease}
+.alert-icon{width:36px;height:36px;border-radius:8px;background:#F5E8D8;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.alert-title{font-weight:700;color:#7A4E20;font-size:13px}
+.alert-sub{font-size:11px;color:#9A6B3A;margin-top:2px}
+.alert-dismiss{background:none;border:1px solid #D9A87A;border-radius:6px;color:#9A6B3A;font-size:11px;padding:4px 10px;font-weight:700}
+
+/* Material selector */
+.mat-selector{margin-bottom:16px;display:flex;gap:8px}
+.mat-btn{flex:1;padding:12px 16px;border-radius:12px;text-align:left;font-size:14px;font-weight:700;transition:all 0.18s;font-family:'DM Sans',sans-serif}
+.mat-btn-name{display:block;font-size:14px;font-weight:700}
+.mat-btn-desc{display:block;font-size:10px;opacity:0.6;font-weight:400;margin-top:3px;line-height:1.4}
+
+/* Region grid */
+.region-grid-wrap{background:#fff;border:1px solid #E5E1D8;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.region-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.region-title{font-size:13px;font-weight:700;color:#1A1814;letter-spacing:-0.2px}
+.region-nat-badge{font-size:11px;color:#96908A;background:#F2F1EC;border:1px solid #E5E1D8;border-radius:6px;padding:3px 10px}
+.region-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.region-btn{background:#F2F1EC;border:1.5px solid #E5E1D8;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;transition:all 0.16s;outline:none}
+.region-btn.active{box-shadow:0 0 0 1px rgba(0,0,0,0.1)}
+.region-name{font-size:11px;font-weight:700;line-height:1.3}
+.region-tag{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.5px}
+.region-price{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin:6px 0 4px}
+.region-diff{font-size:10px;font-weight:700}
+
+/* KPI Cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi-card{border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:1.3px;font-weight:700;margin-bottom:10px;color:#96908A}
+.kpi-value{font-size:24px;font-weight:400;font-family:'DM Serif Display',serif;margin-bottom:4px}
+.kpi-sub{font-size:10px;color:#96908A}
+
+/* Peak/Trough */
+.peak-trough-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.peak-card{background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.peak-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.peak-label{font-size:9px;color:#96908A;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:2px}
+.peak-value{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:1px}
+.peak-month{font-size:11px;color:#96908A}
+
+/* Narrative */
+.narrative{background:#fff;border-radius:0 12px 12px 0;padding:18px 22px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.narrative-label{font-size:9px;color:#96908A;text-transform:uppercase;letter-spacing:1.6px;font-weight:700;margin-bottom:8px}
+.narrative-text{font-size:13px;color:#524E48;line-height:1.85}
+
+/* Day scrubber */
+.scrubber{background:#fff;border:1px solid #E5E1D8;border-radius:14px;padding:24px 28px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.scrubber-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+.scrubber-label{font-size:10px;color:#96908A;letter-spacing:1.6px;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.scrubber-price{font-family:'DM Serif Display',serif;font-size:48px;font-weight:400;line-height:1.05}
+.scrubber-unit{font-size:14px;color:#96908A;margin-left:8px}
+.scrubber-badge{font-size:13px;font-weight:700;border-radius:8px;padding:6px 14px}
+.scrubber-track{position:relative;margin-bottom:6px}
+.scrubber-ticks{position:relative;height:18px;margin-bottom:16px}
+.scrubber-tick{position:absolute;transform:translateX(-50%);font-size:10px;font-weight:600;white-space:nowrap;transition:color 0.2s}
+.snap-btns{display:flex;gap:6px}
+.snap-btn{flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:700;transition:all 0.14s;letter-spacing:0.4px}
+
+/* Chart */
+.chart-wrap{background:#fff;border:1px solid #E5E1D8;border-radius:14px;padding:22px 24px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.chart-title{font-size:15px;font-weight:400;font-family:'DM Serif Display',serif;color:#1A1814;letter-spacing:-0.3px;margin-bottom:4px}
+.chart-sub{font-size:11px;color:#96908A}
+.chart-legend{display:flex;gap:14px;font-size:11px;color:#96908A;font-weight:500}
+.legend-item{display:flex;align-items:center;gap:5px}
+.table-toggle{font-size:11px;font-weight:600;border:1px solid rgba(0,0,0,0.1);border-radius:7px;padding:5px 12px}
+
+/* Monthly table */
+.monthly-table-wrap{background:#fff;border:1px solid #E5E1D8;border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.monthly-table-header{padding:16px 20px 12px;border-bottom:1px solid #E5E1D8;display:flex;justify-content:space-between;align-items:center}
+.monthly-table-title{font-size:13px;font-weight:700;color:#1A1814}
+.monthly-table-sub{font-size:10px;color:#96908A}
+table{width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif}
+th{padding:8px 16px;font-size:9px;color:#96908A;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;border-bottom:1px solid #E5E1D8;background:#F2F1EC}
+th:first-child{text-align:left}
+th:not(:first-child){text-align:right}
+td{padding:9px 16px;font-size:12px;border-bottom:1px solid #E5E1D8}
+td:first-child{font-weight:700;text-align:left}
+td:not(:first-child){text-align:right}
+
+/* Sources */
+.sources{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.source-badge{font-size:10px;color:#96908A;background:#fff;border:1px solid #E5E1D8;border-radius:5px;padding:3px 9px}
+
+/* Loading */
+.loading{height:400px;display:flex;align-items:center;justify-content:center}
+.spinner{width:44px;height:44px;border:3px solid #E5E1D8;border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 18px}
+.loading-text{font-size:12px;color:#96908A;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-align:center}
+
+/* ROI / Value Analysis */
+.roi-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:24px}
+.roi-section-title{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:#1A1814;letter-spacing:-0.5px;margin-bottom:6px}
+.roi-section-sub{font-size:13px;color:#524E48;margin-bottom:24px}
+.panel{background:#fff;border:1px solid #E5E1D8;border-radius:14px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:16px}
+.panel-label{font-size:10px;color:#96908A;text-transform:uppercase;letter-spacing:1.6px;font-weight:700;margin-bottom:16px}
+.slider-wrap{margin-bottom:20px}
+.slider-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.slider-label{font-size:11px;color:#96908A;text-transform:uppercase;letter-spacing:1.1px;font-weight:600}
+.slider-value{font-size:14px;font-weight:700;font-family:'DM Serif Display',serif}
+.slider-track-wrap{position:relative}
+.slider-track-bg{height:4px;background:#F2F1EC;border-radius:2px;border:1px solid #E5E1D8}
+.slider-track-fill{height:100%;border-radius:2px;opacity:0.75;transition:width 0.05s}
+.slider-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#fff;border-width:2.5px;border-style:solid;box-shadow:0 1px 5px rgba(0,0,0,0.14);pointer-events:none;transition:left 0.05s}
+input[type=range].styled{position:absolute;top:-8px;left:0;width:100%;height:22px;opacity:0}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#F2F1EC;border-radius:10px;border:1px solid #E5E1D8;margin-bottom:16px}
+.toggle-title{font-size:12px;color:#524E48;font-weight:600}
+.toggle-sub{font-size:10px;color:#96908A;margin-top:2px}
+.toggle-btn{width:46px;height:26px;border-radius:13px;border:none;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-knob{position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.hero-summary{border-radius:14px;padding:22px 24px;color:white;margin-bottom:4px}
+.hero-label{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;font-weight:700;opacity:0.8;margin-bottom:4px}
+.hero-amount{font-family:'DM Serif Display',serif;font-size:44px;font-weight:400;line-height:1;margin-bottom:2px}
+.hero-sub{font-size:11px;opacity:0.7;margin-bottom:16px}
+.hero-divider{height:1px;background:rgba(255,255,255,0.2);margin-bottom:16px}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.hero-stat{background:rgba(255,255,255,0.13);border-radius:8px;padding:10px 12px}
+.hero-stat-label{font-size:9px;opacity:0.75;text-transform:uppercase;letter-spacing:1.1px;font-weight:700;margin-bottom:4px}
+.hero-stat-value{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:white;line-height:1}
+.factor-card{background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.03);margin-bottom:10px}
+.factor-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.factor-name{font-size:12px;color:#524E48;font-weight:600}
+.factor-amount{font-size:16px;font-weight:400;font-family:'DM Serif Display',serif}
+.factor-tip{font-size:10px;color:#96908A;line-height:1.55;margin-bottom:8px}
+.factor-bar-bg{height:3px;background:#F2F1EC;border-radius:2px}
+.factor-bar-fill{height:100%;border-radius:2px}
+.roi-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:0}
+.roi-tag{font-size:10px;color:#96908A;background:#fff;border:1px solid #E5E1D8;border-radius:6px;padding:4px 10px}
+.roi-disclaimer{font-size:10px;color:#96908A;line-height:1.6;margin-top:8px}
+
+#chart-canvas-container{position:relative;height:300px}
+.custom-tooltip{background:#fff;border:1px solid #CEC9BC;border-radius:10px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.10);min-width:180px;font-family:'DM Sans',sans-serif;pointer-events:none;position:absolute;display:none;z-index:10}
+</style>
 </head>
 <body>
-    <h1>Current Date and Time</h1>
-    <p>2026-02-25 21:18:24 UTC</p>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <div class="logo-icon" id="logo-icon">🪵</div>
+      <span class="logo-title">BuildCast</span>
+      <div class="logo-divider"></div>
+      <span class="logo-sub">Construction Cost Intelligence</span>
+    </div>
+    <div class="header-right">
+      <span class="date-badge">Feb 2026 – Feb 2027</span>
+      <nav class="tab-nav">
+        <button class="tab-btn active" id="tab-forecast" onclick="switchTab('forecast')">📈&nbsp; Forecast</button>
+        <button class="tab-btn" id="tab-roi" onclick="switchTab('roi')">💰&nbsp; Value Analysis</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ALERT -->
+  <div class="alert" id="alert-banner" style="display:none">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="alert-icon">⚠️</div>
+      <div>
+        <p class="alert-title" id="alert-title"></p>
+        <p class="alert-sub">Consider advance procurement or forward contracting to manage exposure.</p>
+      </div>
+    </div>
+    <button class="alert-dismiss" onclick="document.getElementById('alert-banner').style.display='none'">Dismiss</button>
+  </div>
+
+  <!-- MATERIAL SELECTOR -->
+  <div class="mat-selector" id="mat-selector"></div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading-state">
+    <div>
+      <div class="spinner" id="spinner"></div>
+      <p class="loading-text">Computing forecast · 146 months</p>
+    </div>
+  </div>
+
+  <!-- FORECAST TAB CONTENT -->
+  <div id="tab-content-forecast" style="display:none">
+    <div class="region-grid-wrap">
+      <div class="region-header">
+        <p class="region-title" id="region-title"></p>
+        <span class="region-nat-badge" id="region-nat-badge"></span>
+      </div>
+      <div class="region-grid" id="region-grid"></div>
+    </div>
+
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <div class="peak-trough-grid" id="peak-trough-grid"></div>
+
+    <div class="narrative" id="narrative-box" style="border-left:4px solid #5C7A4E">
+      <p class="narrative-label">12-Month Outlook</p>
+      <p class="narrative-text" id="narrative-text"></p>
+    </div>
+
+    <!-- DAY SCRUBBER -->
+    <div class="scrubber">
+      <div class="scrubber-top">
+        <div>
+          <p class="scrubber-label" id="scrubber-label">Price Outlook · Day 180 of 365</p>
+          <div style="display:flex;align-items:baseline">
+            <span class="scrubber-price" id="scrubber-price">$0</span>
+            <span class="scrubber-unit" id="scrubber-unit">$/MBF</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+          <span class="scrubber-badge" id="scrubber-badge">▲ 0%</span>
+          <div style="display:flex;gap:16px">
+            <div style="text-align:right">
+              <p style="font-size:9px;color:#96908A;letter-spacing:1.2px;text-transform:uppercase;font-weight:600">High est.</p>
+              <p style="font-size:13px;font-weight:700;color:#524E48;margin-top:3px" id="scrubber-high">$0</p>
+            </div>
+            <div style="text-align:right">
+              <p style="font-size:9px;color:#96908A;letter-spacing:1.2px;text-transform:uppercase;font-weight:600">Low est.</p>
+              <p style="font-size:13px;font-weight:700;color:#524E48;margin-top:3px" id="scrubber-low">$0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scrubber-track">
+        <div class="slider-track-bg">
+          <div class="slider-track-fill" id="scrubber-fill" style="width:50%"></div>
+        </div>
+        <div class="slider-thumb" id="scrubber-thumb" style="left:50%;border-color:#5C7A4E"></div>
+        <input type="range" class="styled" min="1" max="365" value="180" id="day-slider" oninput="onDayChange(this.value)">
+      </div>
+      <div class="scrubber-ticks" id="scrubber-ticks"></div>
+      <div class="snap-btns" id="snap-btns"></div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div>
+          <p class="chart-title" id="chart-title">Lumber · Midwest · Price Forecast</p>
+          <p class="chart-sub">24-month history · forward forecast Mar 2026 – Feb 2027</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="chart-legend" id="chart-legend"></div>
+          <button class="table-toggle" id="table-toggle-btn" onclick="toggleTable()">Monthly Detail ↓</button>
+        </div>
+      </div>
+      <div id="chart-canvas-container">
+        <canvas id="price-chart"></canvas>
+        <div class="custom-tooltip" id="custom-tooltip"></div>
+      </div>
+    </div>
+
+    <!-- MONTHLY TABLE -->
+    <div id="monthly-table-wrap" style="display:none">
+      <div class="monthly-table-wrap">
+        <div class="monthly-table-header">
+          <p class="monthly-table-title">Monthly Forecast Detail</p>
+          <span class="monthly-table-sub">Mar 2026 – Feb 2027 · 90% CI</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Month</th><th>Forecast</th><th>Low</th><th>High</th><th>vs Today</th><th>CI Width</th>
+              </tr>
+            </thead>
+            <tbody id="monthly-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sources">
+      <span class="source-badge">FRED / St. Louis Fed</span>
+      <span class="source-badge">BLS Producer Price Index</span>
+      <span class="source-badge">RSMeans Regional Index</span>
+      <span class="source-badge">Random Lengths</span>
+    </div>
+  </div>
+
+  <!-- ROI TAB CONTENT -->
+  <div id="tab-content-roi" style="display:none">
+    <h2 class="roi-section-title">Project Value Analysis</h2>
+    <p class="roi-section-sub" id="roi-subtitle"></p>
+    <div class="roi-wrap">
+      <!-- LEFT COLUMN -->
+      <div>
+        <div class="panel">
+          <p class="panel-label">Project Parameters</p>
+          <div id="slider-pv"></div>
+          <div id="slider-mp"></div>
+        </div>
+        <div class="panel">
+          <p class="panel-label">Procurement & Risk</p>
+          <div id="slider-lead"></div>
+          <div id="slider-waste"></div>
+          <div id="slider-delay"></div>
+          <div id="slider-coc"></div>
+        </div>
+        <div class="panel">
+          <p class="panel-label">Contract Settings</p>
+          <div class="toggle-row">
+            <div>
+              <p class="toggle-title">Fixed-Price Contract</p>
+              <p class="toggle-sub">Enables bid margin protection</p>
+            </div>
+            <button class="toggle-btn" id="fixed-price-toggle" onclick="toggleFixedPrice()">
+              <span class="toggle-knob" id="toggle-knob" style="left:23px"></span>
+            </button>
+          </div>
+          <div id="slider-subpct"></div>
+        </div>
+        <div class="roi-tags" id="roi-tags"></div>
+      </div>
+      <!-- RIGHT COLUMN -->
+      <div>
+        <div class="hero-summary" id="hero-summary">
+          <p class="hero-label">Total Estimated Savings</p>
+          <p class="hero-amount" id="hero-amount">$0</p>
+          <p class="hero-sub" id="hero-sub">across 0 active value factors</p>
+          <div class="hero-divider"></div>
+          <div class="hero-stats" id="hero-stats"></div>
+        </div>
+        <p style="font-size:10px;color:#96908A;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:4px 0 2px">Value Breakdown</p>
+        <div id="factors-list"></div>
+        <p class="roi-disclaimer">Estimates based on RSMeans, FMI, and AGC industry benchmarks. Actual results depend on procurement execution, contract terms, and market conditions.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const THEME = {
+  bg:"#F7F6F2", surface:"#FFFFFF", surfaceAlt:"#F2F1EC",
+  border:"#E5E1D8", borderMid:"#CEC9BC",
+  text:"#1A1814", textMid:"#524E48", textSoft:"#96908A",
+};
+const MAT = {
+  Lumber: { base:380, unit:"$/MBF", vol:0.062, seasonal:0.06, trend:0.004,
+    color:"#5C7A4E", pastel:"#EBF2E6", accent:"#3D5C30", light:"#D4E8C8", icon:"🪵",
+    desc:"Framing lumber composite (Random Lengths)" },
+  Steel: { base:950, unit:"$/ton", vol:0.030, seasonal:0.02, trend:0.003,
+    color:"#5A6FA0", pastel:"#E6EBF8", accent:"#354D85", light:"#C4CFEC", icon:"⚙️",
+    desc:"Hot-rolled coil, US Midwest (CRU/CME)" },
+  Concrete: { base:155, unit:"$/ton", vol:0.017, seasonal:0.01, trend:0.002,
+    color:"#9E6E5C", pastel:"#F5EAE5", accent:"#6E4030", light:"#E8CCB8", icon:"🏗️",
+    desc:"Ready-mix concrete, national avg (BLS PPI)" },
+};
+const REGIONS = {
+  "Northeast (NY/NJ/CT)": { lumber:1.18, steel:1.12, concrete:1.22, tag:"High Cost", tc:"#C0685A" },
+  "Southeast (FL/GA/SC)": { lumber:0.94, steel:0.97, concrete:0.91, tag:"Low Cost",  tc:"#5A8C6B" },
+  "Midwest (IL/OH/MI)":   { lumber:0.98, steel:1.05, concrete:0.96, tag:"Avg Cost",  tc:"#6878A8" },
+  "South (TX/OK/AR)":     { lumber:0.92, steel:0.95, concrete:0.89, tag:"Low Cost",  tc:"#5A8C6B" },
+  "Mountain (CO/UT/AZ)":  { lumber:1.04, steel:1.02, concrete:1.08, tag:"Avg Cost",  tc:"#6878A8" },
+  "Pacific (CA/WA/OR)":   { lumber:1.24, steel:1.15, concrete:1.28, tag:"High Cost", tc:"#C0685A" },
+};
+const MN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentMat = "Lumber";
+let currentRegion = "Midwest (IL/OH/MI)";
+let currentDay = 180;
+let currentTab = "forecast";
+let showTable = false;
+let appData = null;
+let chartInstance = null;
+
+// ROI state
+let roi = { pv:10000000, mp:35, lead:60, waste:8, delay:14, coc:8, subPct:40, fixedPrice:true };
+
+// ============================================================
+// MATH UTILITIES
+// ============================================================
+function makeRng(seed) {
+  let s = seed;
+  return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+}
+function computeSeasonalIndices(prices) {
+  const n = prices.length, cma = new Array(n).fill(null);
+  for (let t = 6; t < n - 6; t++) {
+    let s1 = 0, s2 = 0;
+    for (let k = -5; k <= 6; k++) s1 += prices[t + k];
+    for (let k = -6; k <= 5; k++) s2 += prices[t + k];
+    cma[t] = (s1 + s2) / 24;
+  }
+  const bm = Array.from({length:12}, () => []);
+  for (let t = 0; t < n; t++) if (cma[t] !== null) bm[t % 12].push(prices[t] / cma[t]);
+  const raw = bm.map(vals => {
+    if (!vals.length) return 1;
+    const s = [...vals].sort((a,b) => a - b), m = Math.floor(s.length / 2);
+    return s.length % 2 === 0 ? (s[m-1] + s[m]) / 2 : s[m];
+  });
+  const tot = raw.reduce((a,v) => a + v, 0);
+  return raw.map(v => v * 12 / tot);
+}
+function deseasonalize(prices, sIdx) { return prices.map((p, t) => p / sIdx[t % 12]); }
+function difference(series) { return series.slice(1).map((v, i) => v - series[i]); }
+function fitAR1(d) {
+  const m = d.length - 1;
+  if (m < 2) return {phi:0, intercept:0, sigma:10};
+  const y = d.slice(1), x = d.slice(0, -1);
+  const xm = x.reduce((s,v) => s+v, 0)/m, ym = y.reduce((s,v) => s+v, 0)/m;
+  let num = 0, den = 0;
+  for (let i = 0; i < m; i++) { num += (x[i]-xm)*(y[i]-ym); den += (x[i]-xm)**2; }
+  const phi = den > 0 ? Math.max(-0.95, Math.min(0.95, num/den)) : 0;
+  const c = ym - phi * xm;
+  const res = y.map((yi, i) => yi - (c + phi * x[i]));
+  const sig = Math.sqrt(res.reduce((s,e) => s + e**2, 0) / Math.max(m-2, 1));
+  return {phi, intercept:c, sigma:sig};
+}
+function generateHistory(mat, region) {
+  const cfg = MAT[mat], mult = REGIONS[region][mat.toLowerCase()];
+  const base = cfg.base * mult;
+  const seed = [...region, ...mat].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const rng = makeRng(seed);
+  let price = base; const out = [];
+  for (let y = 2014; y <= 2026; y++) {
+    const maxM = y === 2026 ? 2 : 12;
+    for (let m = 1; m <= maxM; m++) {
+      price *= (1+cfg.trend)*(1+cfg.seasonal*Math.sin((m-3)*Math.PI/6))*(1+(rng()-0.5)*cfg.vol*2);
+      if(mat==="Lumber"&&y===2021&&m>=3&&m<=6)  price*=1.17;
+      if(mat==="Lumber"&&y===2021&&m>=7&&m<=10) price*=0.88;
+      if(mat==="Lumber"&&y===2022&&m>=1&&m<=4)  price*=1.09;
+      if(mat==="Lumber"&&y===2023&&m>=6&&m<=9)  price*=0.92;
+      if(mat==="Lumber"&&y===2024&&m>=2&&m<=5)  price*=1.05;
+      if(mat==="Steel" &&y===2022&&m>=3&&m<=6)  price*=1.10;
+      if(mat==="Steel" &&y===2023&&m>=4&&m<=8)  price*=0.93;
+      if(mat==="Steel" &&y===2024&&m>=9&&m<=12) price*=1.04;
+      if(mat==="Steel" &&y===2025&&m<=2)        price*=1.07;
+      if(mat==="Lumber"&&y===2025&&m>=3&&m<=7)  price*=1.08;
+      if(mat==="Lumber"&&y===2025&&m>=8&&m<=12) price*=0.95;
+      if(mat==="Steel" &&y===2025&&m>=3&&m<=6)  price*=1.12;
+      if(mat==="Steel" &&y===2025&&m>=7&&m<=12) price*=0.97;
+      if(mat==="Concrete"&&y===2025)            price*=1.004;
+      if(mat==="Lumber"&&y===2026&&m<=2)        price*=1.03;
+      if(mat==="Steel" &&y===2026&&m<=2)        price*=1.05;
+      if(mat==="Concrete"&&y===2022)            price*=1.003;
+      if(y===2020&&m>=3&&m<=6)                  price*=0.93;
+      price = Math.max(price, base * 0.4);
+      out.push({y, m, price: Math.round(price*100)/100, label:`${MN[m-1]} '${String(y).slice(2)}`});
+    }
+  }
+  return out;
+}
+function forecast12(history, mat) {
+  const prices = history.map(d => d.price), n = prices.length, cfg = MAT[mat], last = history[n-1];
+  const sIdx = computeSeasonalIndices(prices), deseas = deseasonalize(prices, sIdx);
+  const diffed = difference(deseas), {phi, intercept, sigma} = fitAR1(diffed);
+  let lastDeseas = deseas[n-1], lastDiff = diffed[diffed.length-1];
+  const results = [];
+  for (let step = 1; step <= 12; step++) {
+    const mi = (last.m - 1 + step) % 12, yr = last.y + Math.floor((last.m - 1 + step) / 12);
+    const fd = intercept + phi * lastDiff, fds = lastDeseas + fd, fp = fds * sIdx[mi];
+    const varH = Math.abs(phi) < 0.999 ? (sigma**2)*(1-phi**(2*step))/(1-phi**2) : (sigma**2)*step;
+    const minHalf = fp * cfg.vol * (1 + 0.10 * Math.sqrt(step));
+    const halfCI = Math.max(1.645*Math.sqrt(varH)*sIdx[mi], minHalf);
+    results.push({
+      m: mi+1, y: yr, label:`${MN[mi]} '${String(yr).slice(2)}`,
+      value: Math.round(fp*100)/100,
+      upper: Math.round((fp+halfCI)*100)/100,
+      lower: Math.round(Math.max(fp-halfCI*0.75, fp*0.5)*100)/100,
+    });
+    lastDiff = fd; lastDeseas = fds;
+  }
+  return results;
+}
+function toDaily(monthly, lastPrice) {
+  const pivots = [{value:lastPrice,upper:lastPrice,lower:lastPrice}, ...monthly];
+  const dim = [31,28,31,30,31,30,31,31,30,31,30,31];
+  const out = [];
+  for (let seg = 0; seg < monthly.length && out.length < 365; seg++) {
+    const fr = pivots[seg], to = pivots[seg+1], days = dim[(monthly[seg].m-1)%12];
+    for (let d = 0; d < days && out.length < 365; d++) {
+      const t = d / days;
+      out.push({
+        day: out.length+1, short: monthly[seg].label,
+        value: Math.round((fr.value+(to.value-fr.value)*t)*100)/100,
+        upper: Math.round((fr.upper+(to.upper-fr.upper)*t)*100)/100,
+        lower: Math.round((fr.lower+(to.lower-fr.lower)*t)*100)/100,
+      });
+    }
+  }
+  while (out.length < 365) { const l = out[out.length-1]; out.push({...l, day:l.day+1}); }
+  return out.slice(0, 365);
+}
+function buildNarrative(mat, region, cur, end, pct, dir, monthly) {
+  const peakM = monthly.reduce((b,m) => m.value>b.value?m:b, monthly[0]);
+  const troughM = monthly.reduce((b,m) => m.value<b.value?m:b, monthly[0]);
+  const regionShort = region.split(" (")[0];
+  const costTag = REGIONS[region].tag.toLowerCase();
+  const dirWord = dir === "rise" ? "rise" : "ease";
+  const opening = `${mat} prices in ${regionShort} are forecast to ${dirWord} ${pct}% over the next 12 months, from $${Math.round(cur).toLocaleString()} to $${Math.round(end).toLocaleString()} ${MAT[mat].unit}.`;
+  let body = "";
+  if (mat === "Lumber") {
+    body = dir === "rise"
+      ? `Spring demand—driven by housing starts and renovation activity—is expected to push prices to a seasonal peak around ${peakM.label} ($${peakM.value.toLocaleString()}). Ongoing tariff pressures on Canadian softwood imports remain an upside risk. Builders in ${costTag} markets like ${regionShort} should consider locking in Q2 volumes before the spring run-up.`
+      : `Post-spring inventory rebuilding and softening housing permit activity are expected to weigh on prices through mid-year, with a trough near ${troughM.label} ($${troughM.value.toLocaleString()}). This represents a buying opportunity for contractors planning late-summer or fall starts in ${regionShort}.`;
+  } else if (mat === "Steel") {
+    body = dir === "rise"
+      ? `Section 232 tariff carry-through and firming global scrap prices are expected to sustain upward pressure. Hot-rolled coil is projected to reach $${peakM.value.toLocaleString()}/ton around ${peakM.label}. ${regionShort} buyers—already paying a ${costTag} premium—should consider forward contracts or blanket purchase agreements with service centers.`
+      : `Easing trade tensions and growing domestic mini-mill capacity are expected to exert downward pressure on prices, with the low likely around ${troughM.label} ($${troughM.value.toLocaleString()}). Project teams can take advantage by delaying non-critical steel procurement where schedule allows.`;
+  } else {
+    body = dir === "rise"
+      ? `Ready-mix concrete prices continue to track elevated energy and aggregate input costs. Prices in ${regionShort} are expected to gradually climb toward $${peakM.value.toLocaleString()}/ton by ${peakM.label}. The sustained upward drift warrants early subcontractor commitment on structural pours.`
+      : `Concrete pricing is expected to stabilize and drift modestly lower as aggregate and cement input costs ease. The ${regionShort} market should see prices bottom near $${troughM.value.toLocaleString()}/ton around ${troughM.label}.`;
+  }
+  return `${opening} ${body}`;
+}
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+function renderMaterialSelector() {
+  const el = document.getElementById('mat-selector');
+  el.innerHTML = Object.entries(MAT).map(([m, mc]) => {
+    const active = m === currentMat;
+    return `<button class="mat-btn" onclick="selectMat('${m}')" style="
+      border:1.5px solid ${active ? mc.color : THEME.border};
+      background:${active ? mc.pastel : THEME.surface};
+      color:${active ? mc.accent : THEME.textMid};
+      box-shadow:${active ? `0 0 0 1px ${mc.color}33` : '0 1px 3px rgba(0,0,0,0.04)'};
+    ">
+      <span>${mc.icon}</span> <span class="mat-btn-name">${m}</span>
+      <span class="mat-btn-desc">${mc.desc}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderRegionGrid(currentPrice) {
+  const cfg = MAT[currentMat];
+  const mk = currentMat.toLowerCase();
+  document.getElementById('region-title').textContent = `Regional Price Index — ${currentMat}`;
+  document.getElementById('region-nat-badge').textContent = `National avg: $${cfg.base.toLocaleString()} ${cfg.unit}`;
+  const grid = document.getElementById('region-grid');
+  grid.innerHTML = Object.entries(REGIONS).map(([name, info]) => {
+    const mu = info[mk];
+    const pr = name === currentRegion ? Math.round(currentPrice) : Math.round(currentPrice * (mu / REGIONS[currentRegion][mk]));
+    const diff = ((mu - 1) * 100).toFixed(1);
+    const diffColor = mu > 1.05 ? "#BE5A4A" : mu < 0.95 ? "#4A8C62" : "#6878A8";
+    const sel = name === currentRegion;
+    return `<button class="region-btn ${sel?'active':''}" onclick="selectRegion('${name}')" style="
+      background:${sel ? cfg.pastel : THEME.surfaceAlt};
+      border-color:${sel ? cfg.color : THEME.border};
+      box-shadow:${sel ? `0 0 0 1px ${cfg.color}33` : 'none'};
+    ">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span class="region-name" style="color:${sel ? cfg.accent : THEME.textMid}">${name}</span>
+        <span class="region-tag" style="background:${info.tc}18;color:${info.tc}">${info.tag}</span>
+      </div>
+      <p class="region-price" style="color:${sel ? cfg.accent : THEME.text}">$${pr.toLocaleString()}</p>
+      <p class="region-diff" style="color:${diffColor}">${diff > 0 ? '+' : ''}${diff}% vs national</p>
+    </button>`;
+  }).join('');
+}
+
+function renderKPI(data) {
+  const cfg = MAT[currentMat];
+  const cards = [
+    {label:"Current Price",   val:`$${Math.round(data.cur).toLocaleString()}`,              sub:data.unit,                           hl:false, up:undefined},
+    {label:"12-Mo Forecast",  val:`$${Math.round(data.end).toLocaleString()}`,              sub:data.unit,                           hl:true,  up:undefined},
+    {label:"Expected Change", val:`${data.dir==="rise"?"+":"-"}${data.pct}%`,             sub:currentRegion.split("(")[0].trim(),  hl:false, up:data.dir==="rise"},
+    {label:"vs National Avg", val:`${parseFloat(data.vsNat)>0?"+":""}${data.vsNat}%`,     sub:currentRegion.split("(")[0].trim(),  hl:false, up:parseFloat(data.vsNat)>0},
+  ];
+  document.getElementById('kpi-grid').innerHTML = cards.map(c => `
+    <div class="kpi-card" style="
+      background:${c.hl ? `linear-gradient(135deg,${cfg.pastel},${cfg.light}44)` : THEME.surface};
+      border:1.5px solid ${c.hl ? cfg.color : THEME.border};
+      box-shadow:${c.hl ? `0 2px 12px ${cfg.color}22` : '0 1px 3px rgba(0,0,0,0.04)'};
+    ">
+      <p class="kpi-label" style="color:${c.hl ? cfg.accent : THEME.textSoft}">${c.label}</p>
+      <p class="kpi-value" style="color:${c.hl ? cfg.accent : c.up!==undefined ? (c.up?"#BE5A4A":"#4A8C62") : THEME.text}">${c.val}</p>
+      <p class="kpi-sub">${c.sub}</p>
+    </div>`).join('');
+}
+
+function renderPeakTrough(data) {
+  const cfg = MAT[currentMat];
+  document.getElementById('peak-trough-grid').innerHTML = [
+    {label:"Forecast Peak",   val:data.peakM.value,   month:data.peakM.label,   isUp:true},
+    {label:"Forecast Trough", val:data.troughM.value, month:data.troughM.label, isUp:false},
+  ].map(c => `
+    <div class="peak-card">
+      <div class="peak-icon" style="background:${c.isUp?'#FBF0EE':'#EBF5EF'}">${c.isUp?"▲":"▼"}</div>
+      <div>
+        <p class="peak-label">${c.label}</p>
+        <p class="peak-value" style="color:${c.isUp?'#BE5A4A':'#4A8C62'}">$${c.val.toLocaleString()} <span style="font-size:11px;color:#96908A;font-family:'DM Sans',sans-serif">${data.unit}</span></p>
+        <p class="peak-month">${c.month}</p>
+      </div>
+    </div>`).join('');
+}
+
+function renderNarrative(data) {
+  const cfg = MAT[currentMat];
+  const nb = document.getElementById('narrative-box');
+  nb.style.borderLeftColor = cfg.color;
+  document.getElementById('narrative-text').textContent = data.narrative;
+}
+
+function renderScrubber(data) {
+  const cfg = MAT[currentMat];
+  // Ticks
+  const ticks = [{d:1,l:"Mar '26"},{d:92,l:"Jun '26"},{d:183,l:"Sep '26"},{d:275,l:"Dec '26"},{d:365,l:"Feb '27"}];
+  document.getElementById('scrubber-ticks').innerHTML = ticks.map(q => `
+    <span class="scrubber-tick" style="left:${((q.d-1)/364*100).toFixed(1)}%;color:${currentDay>=q.d-10?cfg.color:THEME.textSoft}">${q.l}</span>
+  `).join('');
+  // Snap btns
+  const snaps = [{l:"1M",d:30},{l:"3M",d:91},{l:"6M",d:182},{l:"9M",d:273},{l:"1Y",d:365}];
+  document.getElementById('snap-btns').innerHTML = snaps.map(({l,d}) => {
+    const active = Math.abs(currentDay - d) <= 15;
+    return `<button class="snap-btn" onclick="snapDay(${d})" style="
+      border:1px solid ${active ? cfg.color : THEME.border};
+      background:${active ? cfg.pastel : THEME.surface};
+      color:${active ? cfg.accent : THEME.textMid};
+    ">${l}</button>`;
+  }).join('');
+  document.getElementById('scrubber-thumb').style.borderColor = cfg.color;
+  document.getElementById('scrubber-fill').style.background = `linear-gradient(90deg,${cfg.color}88,${cfg.color})`;
+  updateScrubberDisplay(data);
+}
+
+function updateScrubberDisplay(data) {
+  const cfg = MAT[currentMat];
+  const sel = data.daily[currentDay - 1];
+  const pct = (((sel.value - data.daily[0].value) / data.daily[0].value) * 100).toFixed(1);
+  const isUp = parseFloat(pct) >= 0;
+  const trackPc = ((currentDay - 1) / 364 * 100).toFixed(2);
+  document.getElementById('scrubber-label').textContent = `Price Outlook · Day ${currentDay} of 365 · ${sel.short}`;
+  document.getElementById('scrubber-price').textContent = `$${sel.value.toLocaleString()}`;
+  document.getElementById('scrubber-price').style.color = cfg.accent;
+  document.getElementById('scrubber-unit').textContent = data.unit;
+  document.getElementById('scrubber-badge').textContent = `${isUp?"▲":"▼"} ${Math.abs(pct)}% from today`;
+  document.getElementById('scrubber-badge').style.color = isUp ? "#BE5A4A" : "#4A8C62";
+  document.getElementById('scrubber-badge').style.background = isUp ? "#FBF0EE" : "#EBF5EF";
+  document.getElementById('scrubber-badge').style.border = `1px solid ${isUp?"#E8B8B0":"#B0D8BE"}`;
+  document.getElementById('scrubber-fill').style.width = trackPc + '%';
+  document.getElementById('scrubber-thumb').style.left = trackPc + '%';
+  document.getElementById('scrubber-high').textContent = `$${sel.upper?.toLocaleString()}`;
+  document.getElementById('scrubber-low').textContent = `$${sel.lower?.toLocaleString()}`;
+  // Update ticks color
+  const ticks = document.querySelectorAll('.scrubber-tick');
+  const tickDays = [1, 92, 183, 275, 365];
+  ticks.forEach((t, i) => {
+    t.style.color = currentDay >= tickDays[i] - 10 ? cfg.color : THEME.textSoft;
+  });
+  // Update snap btns
+  const snaps = document.querySelectorAll('.snap-btn');
+  const snapDays = [30, 91, 182, 273, 365];
+  snaps.forEach((btn, i) => {
+    const active = Math.abs(currentDay - snapDays[i]) <= 15;
+    btn.style.borderColor = active ? cfg.color : THEME.border;
+    btn.style.background = active ? cfg.pastel : THEME.surface;
+    btn.style.color = active ? cfg.accent : THEME.textMid;
+  });
+}
+
+// Custom annotation plugin for reference lines
+const refLinePlugin = {
+  id: 'refLines',
+  afterDraw(chart, args, options) {
+    const {ctx, chartArea, scales} = chart;
+    const xScale = scales.x;
+    if (!xScale || !options.lines) return;
+    options.lines.forEach(line => {
+      const idx = chart.data.labels.indexOf(line.label);
+      if (idx < 0) return;
+      const x = xScale.getPixelForValue(idx);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.setLineDash(line.dash || [4, 3]);
+      ctx.strokeStyle = line.color;
+      ctx.lineWidth = line.width || 1.5;
+      ctx.stroke();
+      // Label
+      ctx.setLineDash([]);
+      ctx.fillStyle = line.color;
+      ctx.font = `600 10px 'DM Sans', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(line.text, x, chartArea.bottom + 14);
+      ctx.restore();
+    });
+  }
+};
+Chart.register(refLinePlugin);
+
+function getRefLines(data) {
+  const cfg = MAT[currentMat];
+  const hlLabel = data.daily[currentDay - 1]?.short;
+  const lines = [
+    { label: "Feb '26", color: THEME.borderMid, dash: [4,3], width: 1.5, text: 'Today' }
+  ];
+  if (hlLabel && hlLabel !== "Feb '26") {
+    lines.push({ label: hlLabel, color: cfg.color, dash: [3,3], width: 1.5, text: `Day ${currentDay}` });
+  }
+  return lines;
+}
+
+function renderChart(data) {
+  const cfg = MAT[currentMat];
+  const hist24 = data.hist.slice(-24);
+  const labels = [...hist24.map(d => d.label), ...data.monthly.map(m => m.label)];
+  const actualData = [...hist24.map(d => d.price), ...data.monthly.map(() => null)];
+  const forecastData = [...hist24.map(() => null), ...data.monthly.map(m => m.value)];
+  const upperData = [...hist24.map(() => null), ...data.monthly.map(m => m.upper)];
+  const lowerData = [...hist24.map(() => null), ...data.monthly.map(m => m.lower)];
+
+  // Chart legend
+  document.getElementById('chart-legend').innerHTML = `
+    <span class="legend-item"><span style="width:20px;height:2px;background:${cfg.color};display:inline-block;border-radius:1px;opacity:0.9"></span>Historical</span>
+    <span class="legend-item"><span style="width:20px;height:2px;background:${cfg.color};display:inline-block;border-radius:1px;opacity:0.6;border-top:2px dashed ${cfg.color}"></span>Forecast</span>
+    <span class="legend-item"><span style="width:20px;height:8px;background:${cfg.color};display:inline-block;opacity:0.12;border-radius:2px"></span>90% CI</span>
+  `;
+  document.getElementById('chart-title').textContent = `${currentMat} · ${currentRegion.split("(")[0].trim()} · Price Forecast`;
+  document.getElementById('table-toggle-btn').style.color = cfg.accent;
+  document.getElementById('table-toggle-btn').style.background = cfg.pastel;
+  document.getElementById('table-toggle-btn').style.borderColor = cfg.color + '44';
+
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  const ctx = document.getElementById('price-chart').getContext('2d');
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Upper CI',
+          data: upperData,
+          borderColor: cfg.color + '30',
+          borderWidth: 1,
+          fill: '+1',
+          backgroundColor: cfg.color + '18',
+          pointRadius: 0,
+          tension: 0.3,
+        },
+        {
+          label: 'Forecast',
+          data: forecastData,
+          borderColor: cfg.color,
+          borderWidth: 2,
+          borderDash: [6, 4],
+          fill: false,
+          pointRadius: 0,
+          tension: 0.3,
+          spanGaps: false,
+        },
+        {
+          label: 'Lower CI',
+          data: lowerData,
+          borderColor: cfg.color + '30',
+          borderWidth: 1,
+          fill: false,
+          backgroundColor: 'transparent',
+          pointRadius: 0,
+          tension: 0.3,
+        },
+        {
+          label: 'Historical',
+          data: actualData,
+          borderColor: cfg.color,
+          borderWidth: 2.5,
+          fill: true,
+          backgroundColor: (ctx2) => {
+            const gradient = ctx2.chart.ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, cfg.color + '33');
+            gradient.addColorStop(1, cfg.color + '00');
+            return gradient;
+          },
+          pointRadius: 0,
+          tension: 0.3,
+          spanGaps: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { bottom: 8 } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        refLines: { lines: getRefLines(data) },
+        tooltip: { enabled: false,
+          external: (context) => {
+            const tooltip = document.getElementById('custom-tooltip');
+            if (context.tooltip.opacity === 0) { tooltip.style.display = 'none'; return; }
+            const d = context.tooltip.dataPoints;
+            const hist = d.find(p => p.dataset.label === 'Historical');
+            const fore = d.find(p => p.dataset.label === 'Forecast');
+            const upper = d.find(p => p.dataset.label === 'Upper CI');
+            const lower = d.find(p => p.dataset.label === 'Lower CI');
+            const val = hist || fore;
+            if (!val || val.raw === null) { tooltip.style.display = 'none'; return; }
+            let html = `<p style="margin:0 0 8px;font-size:11px;color:#96908A;font-weight:600;letter-spacing:0.6px">${context.tooltip.title[0]}</p>`;
+            html += `<p style="margin:2px 0;font-size:17px;font-weight:700;color:${cfg.color}">$${val.raw?.toLocaleString()} <span style="font-size:11px;color:#96908A;font-weight:400">${data.unit}</span></p>`;
+            if (upper && lower && upper.raw !== null && lower.raw !== null) {
+              html += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #E5E1D8;display:flex;gap:14px">
+                <span style="font-size:10px;color:#96908A">High <b style="color:#524E48">$${upper.raw.toLocaleString()}</b></span>
+                <span style="font-size:10px;color:#96908A">Low <b style="color:#524E48">$${lower.raw.toLocaleString()}</b></span>
+              </div>`;
+            }
+            tooltip.innerHTML = html;
+            tooltip.style.display = 'block';
+            const {chart} = context;
+            const x = context.tooltip.caretX;
+            const y = context.tooltip.caretY;
+            tooltip.style.left = Math.min(x + 12, chart.width - 200) + 'px';
+            tooltip.style.top = Math.max(y - 40, 0) + 'px';
+          }
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#96908A', font: {size:10, family:"'DM Sans',sans-serif"}, maxTicksLimit: 10 },
+          grid: { display: false },
+          border: { color: THEME.border },
+        },
+        y: {
+          ticks: { color: '#96908A', font: {size:10, family:"'DM Sans',sans-serif"}, callback: v => `$${v.toLocaleString()}` },
+          grid: { color: THEME.border, borderDash: [2, 5] },
+          border: { display: false },
+        },
+      },
+    },
+  });
+}
+
+function updateChartRefLines(data) {
+  if (!chartInstance) return;
+  chartInstance.options.plugins.refLines.lines = getRefLines(data);
+  chartInstance.update('none');
+}
+
+function renderMonthlyTable(data) {
+  document.getElementById('monthly-tbody').innerHTML = data.monthly.map((m, i) => {
+    const chg = ((m.value - data.cur) / data.cur * 100).toFixed(1);
+    const isUp = parseFloat(chg) >= 0;
+    const ciW = m.upper - m.lower, ciPct = ((ciW / m.value) * 100).toFixed(0);
+    const cfg = MAT[currentMat];
+    return `<tr style="border-bottom:1px solid ${THEME.border};background:${i%2===0?THEME.surface:THEME.surfaceAlt+'66'}">
+      <td style="font-weight:700">${m.label}</td>
+      <td style="font-size:13px;font-weight:700;color:${cfg.accent};font-family:'DM Serif Display',serif">$${m.value.toLocaleString()}</td>
+      <td style="font-size:11px;color:#96908A">$${m.lower.toLocaleString()}</td>
+      <td style="font-size:11px;color:#96908A">$${m.upper.toLocaleString()}</td>
+      <td><span style="font-size:11px;font-weight:700;color:${isUp?'#BE5A4A':'#4A8C62'};background:${isUp?'#FBF0EE':'#EBF5EF'};border-radius:4px;padding:2px 7px">${isUp?"▲":"▼"} ${Math.abs(chg)}%</span></td>
+      <td>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+          <div style="width:36px;height:3px;background:${THEME.border};border-radius:2px">
+            <div style="height:100%;width:${Math.min(parseInt(ciPct)*2,100)}%;background:${cfg.color};border-radius:2px;opacity:0.6"></div>
+          </div>
+          <span style="font-size:10px;color:#96908A;min-width:28px;text-align:right">±${ciPct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAlert(data) {
+  const banner = document.getElementById('alert-banner');
+  if (data.dir === "rise" && parseFloat(data.pct) > 5) {
+    document.getElementById('alert-title').textContent = `${currentMat} prices in ${currentRegion.split(" (")[0]} are forecast to rise ${data.pct}% over 12 months.`;
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ============================================================
+// ROI RENDERING
+// ============================================================
+function makeSlider(containerId, label, min, max, step, val, key, dispFn, color, accent) {
+  const pct = ((val - min) / (max - min) * 100).toFixed(1);
+  document.getElementById(containerId).innerHTML = `
+    <div class="slider-wrap">
+      <div class="slider-header">
+        <label class="slider-label">${label}</label>
+        <span class="slider-value" style="color:${accent}" id="slval-${key}">${dispFn(val)}</span>
+      </div>
+      <div class="slider-track-wrap">
+        <div class="slider-track-bg">
+          <div class="slider-track-fill" id="slfill-${key}" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="slider-thumb" id="slthumb-${key}" style="left:${pct}%;border-color:${color}"></div>
+        <input type="range" class="styled" min="${min}" max="${max}" step="${step}" value="${val}"
+          oninput="onSliderChange('${key}', this.value, ${min}, ${max})"
+          style="position:absolute;top:-8px;left:0;width:100%;height:22px;opacity:0">
+      </div>
+    </div>`;
+}
+
+function onSliderChange(key, val, min, max) {
+  roi[key] = parseFloat(val);
+  const sliders = {
+    pv: { disp: v => `$${(v/1e6).toFixed(1)}M` },
+    mp: { disp: v => `${v}%` },
+    lead: { disp: v => `${v} days` },
+    waste: { disp: v => `${v}%` },
+    delay: { disp: v => `${v} days` },
+    coc: { disp: v => `${v}%` },
+    subPct: { disp: v => `${v}%` },
+  };
+  const pct = ((parseFloat(val) - min) / (max - min) * 100).toFixed(1);
+  const cfg = MAT[currentMat];
+  document.getElementById(`slval-${key}`).textContent = sliders[key].disp(parseFloat(val));
+  document.getElementById(`slfill-${key}`).style.width = pct + '%';
+  document.getElementById(`slthumb-${key}`).style.left = pct + '%';
+  renderROIResults();
+}
+
+function toggleFixedPrice() {
+  roi.fixedPrice = !roi.fixedPrice;
+  const cfg = MAT[currentMat];
+  const btn = document.getElementById('fixed-price-toggle');
+  btn.style.background = roi.fixedPrice ? cfg.color : THEME.borderMid;
+  document.getElementById('toggle-knob').style.left = roi.fixedPrice ? '23px' : '3px';
+  renderROIResults();
+}
+
+function renderROISliders() {
+  const cfg = MAT[currentMat];
+  makeSlider('slider-pv', 'Total Project Value', 500000, 100000000, 500000, roi.pv, 'pv', v => `$${(v/1e6).toFixed(1)}M`, cfg.color, cfg.accent);
+  makeSlider('slider-mp', 'Materials (% of budget)', 10, 70, 5, roi.mp, 'mp', v => `${v}%`, cfg.color, cfg.accent);
+  makeSlider('slider-lead', 'Procurement Lead Time', 14, 120, 7, roi.lead, 'lead', v => `${v} days`, cfg.color, cfg.accent);
+  makeSlider('slider-waste', 'Waste / Buffer %', 2, 20, 1, roi.waste, 'waste', v => `${v}%`, cfg.color, cfg.accent);
+  makeSlider('slider-delay', 'Schedule Delay Exposure', 0, 60, 7, roi.delay, 'delay', v => `${v} days`, cfg.color, cfg.accent);
+  makeSlider('slider-coc', 'Cost of Capital %', 4, 14, 0.5, roi.coc, 'coc', v => `${v}%`, cfg.color, cfg.accent);
+  makeSlider('slider-subpct', 'Subcontractor Passthrough %', 20, 60, 5, roi.subPct, 'subPct', v => `${v}%`, cfg.color, cfg.accent);
+
+  const btn = document.getElementById('fixed-price-toggle');
+  btn.style.background = roi.fixedPrice ? cfg.color : THEME.borderMid;
+  document.getElementById('toggle-knob').style.left = roi.fixedPrice ? '23px' : '3px';
+}
+
+function computeROI(data) {
+  const {pv, mp, lead, waste, delay, coc, subPct, fixedPrice} = roi;
+  const forecastPct = data.pct, forecastDir = data.dir, monthly = data.monthly, currentPrice = data.cur;
+  const fmt = n => n >= 1e6 ? `$${(n/1e6).toFixed(2)}M` : `$${Math.round(n).toLocaleString()}`;
+  const fmtK = n => n >= 1000 ? `$${(n/1000).toFixed(0)}K` : `$${Math.round(n).toLocaleString()}`;
+  const matCost = pv * (mp / 100);
+  const priceDrift = parseFloat(forecastPct) / 100;
+  const isRising = forecastDir === "rise";
+  const leadMonths = Math.max(1, Math.min(Math.round(lead/30), 11));
+  const priceAtDelivery = monthly && monthly[leadMonths-1] ? monthly[leadMonths-1].value : currentPrice;
+  const priceMoveByDel = Math.abs((priceAtDelivery - currentPrice) / Math.max(currentPrice, 1));
+  const timingSavings = matCost * priceMoveByDel * 0.65;
+  const avgCIWidth = monthly ? monthly.reduce((s,m) => s+(m.upper-m.lower), 0)/12 : currentPrice*0.08;
+  const ciAsPct = avgCIWidth / Math.max(currentPrice, 1);
+  const bufferReduction = Math.max(0.10, Math.min(0.35, 0.40 - ciAsPct*0.8));
+  const wasteSavings = matCost * (waste/100) * bufferReduction;
+  const workingDayBurn = pv / 250;
+  const avoidanceRate = 0.50 * (isRising ? 1.3 : 0.6);
+  const delayMitigation = workingDayBurn * delay * avoidanceRate;
+  const capitalBenefit = matCost * (lead/365) * (coc/100);
+  const bidSavings = fixedPrice ? Math.max(0, matCost*0.08 - matCost*ciAsPct*0.5) : 0;
+  const escalationExp = priceDrift > 0.05 ? matCost*(priceDrift-0.05)*(subPct/100) : 0;
+  const escalationSav = escalationExp * 0.55;
+  const subProb = isRising ? (priceDrift>0.10?0.25:0.10) : 0.03;
+  const substitutionSav = matCost * subProb * 0.035;
+  const totalBenefit = timingSavings+wasteSavings+delayMitigation+capitalBenefit+bidSavings+escalationSav+substitutionSav;
+  const savingsAsPctMat = ((totalBenefit/Math.max(matCost,1))*100).toFixed(1);
+  const savingsPerMil = Math.round(totalBenefit/(pv/1e6));
+  const ri = REGIONS[currentRegion];
+  const rMult = (ri.lumber+ri.steel+ri.concrete)/3;
+  const regionDiff = ((rMult-1)*100).toFixed(1);
+  const nFactors = [timingSavings,wasteSavings,delayMitigation,capitalBenefit,bidSavings,escalationSav,substitutionSav].filter(v=>v>50).length;
+  const factors = [
+    {label:"Procurement Timing", val:timingSavings, tip:`Locking in ${lead}-day procurement before the predicted ${isRising?"rise":"dip"} captures ~65% of the move. Month-${leadMonths} forecast: $${priceAtDelivery?.toLocaleString()}.`},
+    {label:"Waste & Buffer Reduction", val:wasteSavings, tip:`CI width of ${(ciAsPct*100).toFixed(1)}% supports ${(bufferReduction*100).toFixed(0)}% tighter buffer ordering, reducing carry and disposal costs.`},
+    {label:"Schedule Risk Avoided", val:delayMitigation, tip:`${isRising?"Rising":"Falling"} prices cause ${isRising?"more":"less"} re-sequencing risk. ${delay} days exposure at ${(avoidanceRate*100).toFixed(0)}% avoidance rate on $${Math.round(workingDayBurn).toLocaleString()}/working-day.`},
+    {label:"Working Capital", val:capitalBenefit, tip:`Optimal drawdown timing frees capital for ${lead} days at your ${coc}% cost of capital.`},
+    ...(fixedPrice?[{label:"Bid Margin Protection", val:bidSavings, tip:`8% standard contingency reduced to ${(ciAsPct*50).toFixed(1)}% with forecast-backed CI of ${(ciAsPct*100).toFixed(1)}%.`}]:[]),
+    ...(escalationSav>0?[{label:"Escalation Clause Avoidance", val:escalationSav, tip:`${forecastPct}% forecast triggers sub escalation clauses. ${subPct}% passthrough exposes $${fmtK(escalationExp)}. Forward contracts avoid ~55%.`}]:[]),
+    ...(substitutionSav>50?[{label:"Substitution Avoidance", val:substitutionSav, tip:`${isRising&&priceDrift>0.10?"25%":isRising?"10%":"3%"} probability of forced substitution. Re-engineering + spec premium ≈ 3.5% of affected material.`}]:[]),
+  ].filter(f => f.val > 50);
+  return {totalBenefit, savingsAsPctMat, savingsPerMil, factors, nFactors, matCost, regionDiff, leadMonths, fmt, fmtK};
+}
+
+function renderROIResults() {
+  if (!appData) return;
+  const cfg = MAT[currentMat];
+  const r = computeROI(appData);
+  document.getElementById('roi-subtitle').innerHTML = `Contractor savings estimate · <span style="color:${cfg.accent};font-weight:600">${currentRegion}</span> · ${appData.dir==="rise"?"▲":"▼"} ${appData.pct}% outlook · <span style="color:${cfg.accent};font-weight:600">${r.nFactors} active factors</span>`;
+  document.getElementById('hero-summary').style.background = `linear-gradient(135deg,${cfg.accent}EE,${cfg.accent}BB)`;
+  document.getElementById('hero-amount').textContent = r.fmt(r.totalBenefit);
+  document.getElementById('hero-sub').textContent = `across ${r.nFactors} active value factors`;
+  document.getElementById('hero-stats').innerHTML = [
+    {label:"% of Material Budget", val:`${r.savingsAsPctMat}%`},
+    {label:"Per $1M of Project", val:`$${(r.savingsPerMil/1000).toFixed(0)}K`},
+    {label:"% of Total Budget", val:`${((r.totalBenefit/roi.pv)*100).toFixed(1)}%`},
+  ].map(m => `<div class="hero-stat">
+    <p class="hero-stat-label">${m.label}</p>
+    <p class="hero-stat-value">${m.val}</p>
+  </div>`).join('');
+  document.getElementById('factors-list').innerHTML = r.factors.map(f => `
+    <div class="factor-card">
+      <div class="factor-top">
+        <span class="factor-name">${f.label}</span>
+        <span class="factor-amount" style="color:${cfg.accent}">${r.fmtK(f.val)}</span>
+      </div>
+      <p class="factor-tip">${f.tip}</p>
+      <div class="factor-bar-bg">
+        <div class="factor-bar-fill" style="width:${Math.min((f.val/r.totalBenefit)*100,100).toFixed(1)}%;background:linear-gradient(90deg,${cfg.color}88,${cfg.color})"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('roi-tags').innerHTML = [
+    `Material budget: ${r.fmt(r.matCost)}`,
+    `Lead → month ${r.leadMonths}`,
+    `Region: ${parseFloat(r.regionDiff)>0?"+":""}${r.regionDiff}% vs nat.`
+  ].map(t => `<span class="roi-tag">${t}</span>`).join('');
+}
+
+// ============================================================
+// MAIN COMPUTE & RENDER
+// ============================================================
+function computeAndRender() {
+  document.getElementById('loading-state').style.display = 'flex';
+  document.getElementById('tab-content-forecast').style.display = 'none';
+  document.getElementById('tab-content-roi').style.display = 'none';
+  // Set spinner color
+  const cfg = MAT[currentMat];
+  document.getElementById('spinner').style.borderTopColor = cfg.color;
+  document.getElementById('logo-icon').style.background = cfg.color;
+  document.getElementById('logo-icon').textContent = cfg.icon;
+
+  setTimeout(() => {
+    const mult = REGIONS[currentRegion][currentMat.toLowerCase()];
+    const hist = generateHistory(currentMat, currentRegion);
+    const monthlyRaw = forecast12(hist, currentMat);
+    const monthly = monthlyRaw.map(m => ({
+      ...m,
+      value: Math.round(m.value * mult * 100) / 100,
+      upper: Math.round(m.upper * mult * 100) / 100,
+      lower: Math.round(m.lower * mult * 100) / 100,
+    }));
+    const daily = toDaily(monthly, hist[hist.length-1].price);
+    const cur = hist[hist.length-1].price, end = monthly[monthly.length-1].value;
+    const pct = Math.abs(((end - cur) / cur) * 100).toFixed(1), dir = end > cur ? "rise" : "fall";
+    const vsNat = (((cfg.base * mult - cfg.base) / cfg.base) * 100).toFixed(1);
+    const narrative = buildNarrative(currentMat, currentRegion, cur, end, pct, dir, monthly);
+    const peakM = monthly.reduce((b,m) => m.value>b.value?m:b, monthly[0]);
+    const troughM = monthly.reduce((b,m) => m.value<b.value?m:b, monthly[0]);
+    appData = {hist, monthly, daily, cur, end, pct, dir, vsNat, unit: cfg.unit, narrative, peakM, troughM};
+
+    document.getElementById('loading-state').style.display = 'none';
+    renderAlert(appData);
+    renderMaterialSelector();
+
+    if (currentTab === 'forecast') {
+      document.getElementById('tab-content-forecast').style.display = 'block';
+      renderRegionGrid(cur);
+      renderKPI(appData);
+      renderPeakTrough(appData);
+      renderNarrative(appData);
+      renderScrubber(appData);
+      renderChart(appData);
+      renderMonthlyTable(appData);
+    } else {
+      document.getElementById('tab-content-roi').style.display = 'block';
+      renderROISliders();
+      renderROIResults();
+    }
+  }, 550);
+}
+
+// ============================================================
+// EVENT HANDLERS
+// ============================================================
+function selectMat(mat) {
+  currentMat = mat;
+  computeAndRender();
+}
+function selectRegion(region) {
+  currentRegion = region;
+  computeAndRender();
+}
+function onDayChange(val) {
+  currentDay = parseInt(val);
+  if (appData) {
+    updateScrubberDisplay(appData);
+    updateChartRefLines(appData);
+  }
+}
+function snapDay(d) {
+  currentDay = d;
+  document.getElementById("day-slider").value = d;
+  if (appData) {
+    updateScrubberDisplay(appData);
+    updateChartRefLines(appData);
+  }
+}
+function toggleTable() {
+  showTable = !showTable;
+  document.getElementById('monthly-table-wrap').style.display = showTable ? 'block' : 'none';
+  document.getElementById('table-toggle-btn').textContent = showTable ? 'Hide Table' : 'Monthly Detail ↓';
+}
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-forecast').classList.toggle('active', tab === 'forecast');
+  document.getElementById('tab-roi').classList.toggle('active', tab === 'roi');
+  const cfg = MAT[currentMat];
+  document.getElementById('tab-forecast').style.color = tab === 'forecast' ? cfg.accent : THEME.textMid;
+  document.getElementById('tab-roi').style.color = tab === 'roi' ? cfg.accent : THEME.textMid;
+  if (appData) {
+    document.getElementById('loading-state').style.display = 'none';
+    if (tab === 'forecast') {
+      document.getElementById('tab-content-forecast').style.display = 'block';
+      document.getElementById('tab-content-roi').style.display = 'none';
+    } else {
+      document.getElementById('tab-content-forecast').style.display = 'none';
+      document.getElementById('tab-content-roi').style.display = 'block';
+      renderROISliders();
+      renderROIResults();
+    }
+  }
+}
+
+// Init
+computeAndRender();
+</script>
 </body>
 </html>
